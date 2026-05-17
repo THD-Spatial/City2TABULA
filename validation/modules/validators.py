@@ -195,7 +195,13 @@ def validate_surface_attributes(surface_calc_df, surface_thematic_df, attribute_
         # Calculate differences and errors
         merged['attribute_name'] = computed_column
         merged['calculated_value'] = merged[computed_column]
-        merged['difference'] = merged['calculated_value'] - merged['thematic_value']
+
+        # Azimuth is circular (0–360°): wrap difference into [-180, 180]
+        if computed_column == 'azimuth':
+            raw_diff = merged['calculated_value'] - merged['thematic_value']
+            merged['difference'] = (raw_diff + 180) % 360 - 180
+        else:
+            merged['difference'] = merged['calculated_value'] - merged['thematic_value']
 
         # Calculate percentage error (handle division by zero)
         merged['percent_error'] = np.where(
