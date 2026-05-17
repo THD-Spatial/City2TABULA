@@ -204,10 +204,7 @@ SELECT
     -- ST_IsValid is CSE'd with the is_valid column below (one evaluation per row).
     CASE
       WHEN objectclass_id IN (709, 710, 712)
-        THEN {city2tabula_schema}.surface_area_corrected_geom(
-          CASE WHEN NOT ST_IsValid(valid_geom) THEN ST_MakeValid(valid_geom) ELSE valid_geom END,
-          nx, ny, nz
-        )
+        THEN {city2tabula_schema}.surface_area_corrected_geom(valid_geom, nx, ny, nz)
       ELSE NULL
     END AS surface_area,
     'sqm' AS surface_area_unit,
