@@ -200,15 +200,16 @@ def validate_surface_attributes(surface_calc_df, surface_thematic_df, attribute_
         if computed_column == 'azimuth':
             raw_diff = merged['calculated_value'] - merged['thematic_value']
             merged['difference'] = (raw_diff + 180) % 360 - 180
+            # Percent error is meaningless for circular quantities — a 2° error on a
+            # 1° thematic value gives 200% regardless of actual geometric accuracy.
+            merged['percent_error'] = np.nan
         else:
             merged['difference'] = merged['calculated_value'] - merged['thematic_value']
-
-        # Calculate percentage error (handle division by zero)
-        merged['percent_error'] = np.where(
-            merged['thematic_value'] != 0,
-            (merged['difference'] / merged['thematic_value']) * 100,
-            np.nan
-        )
+            merged['percent_error'] = np.where(
+                merged['thematic_value'] != 0,
+                (merged['difference'] / merged['thematic_value']) * 100,
+                np.nan
+            )
 
         # Keep only needed columns
         result_cols = base_cols + [
